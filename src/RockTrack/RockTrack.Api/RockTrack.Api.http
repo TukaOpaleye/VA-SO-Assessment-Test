@@ -1,0 +1,6 @@
+@RockTrack.Api_HostAddress = http://localhost:5118
+
+GET {{RockTrack.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

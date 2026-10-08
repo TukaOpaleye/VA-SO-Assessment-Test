@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="RockTrack.Api/RockTrack.Api.csproj" />
+  <Project Path="RockTrack.Core/RockTrack.Core.csproj" />
+  <Project Path="RockTrack.Infrastructure/RockTrack.Infrastructure.csproj" />
+</Solution>

@@ -1,0 +1,45 @@
+
+
+
+1. Choice of Azure Compute Service:
+
+
+I recommend Azure Container Apps (ACA) mainly because the scenario describes a small service with weekly commitments of rocks - this indicates that we will likely have daytime spikes and an overnight lull in demand with idle periods. Also the word small seems to indicate a lower membership number initially. ACA  can scale to zero when idle and incure no compute costs and can scale out when we have weekly spikes.
+Although development is constrained to using an in-memory collection, a production application would certain use database hence scaling down to zero is a real choice e.g. overnight and during the weekend. 
+
+A decision will need to be made around cold-starts (if scaling to zero is an option) and acceptable user response times on teh first application starts.  Possible strategies to work around this tension are:
+1. A scheduled replica  start as a warm up that can allow faster initial response from users say in the morning
+2. In a multi environment scenario eg dev, staging and production,  dev and staging scale down to zero replicas when not in use. prod can maintain a sigle replica longer as needed. 
+3. We can use Native AOT within ACA for faster Web API cold start response.  
+
+
+Azure App Service would be a great contender except for the cost as it only only supports an always-on sceanario - hence you pay for compute even when teh site is idle.  
+
+Azure functions are ideal for event handling scenarios and HTTP is one teh events supported but has a contrived support for APIs (e.g. limited ASP.NET Core pipeline) as it is not designed from teh ground up to handle HTTP. 
+
+
+2. Exposing the API to external clients 
+
+If the API is exposed directly and publiclly, this would cheap and simple and would scale all teh way down to zero but it would  would also expose the API to
+- uncontroled rate usages and application level abuse that may overwhelm teh backedn 
+- and some forms of firect DOS attacks by itself
+ 
+By Adding Azure API management (APIM) - you get mechanisms that mitigate the above issues like Rate Limiting, Quotas, Concurrency Limits, IP filtering, Response caching that provide a layer of protection 
+and would be sufficient for most applications although it does not porovide complete protection from DOS attacks. APIM adds a permanent always on cost to running and API.
+
+Azure Front Door is a global edge networkk like Clouflare that provide services like Caching/CDN, DDoS absorption. It solves a different and complementary problem to APIM  APIM ussually sits in tamden with it.  Along with the added protection means additional costs. Azure Front Door adoption is ussually driven by business need - for example revenue critical availability, DDoS protection and service provided across multiple globally across multiple countries. For an initial release of a new service APIm would be sufficient.     
+
+
+
+ 
+
+
+
+
+
+
+
+Security Concerns
+
+1. One Key for all Clients (implied by the necessity of storage of a single) is a security concern as all members can use it to access members potentially not belonging to them.
+2. 
