@@ -24,5 +24,10 @@ namespace RockTrack.Core.Services
             await _repository.AddAsync(rock);
             return rock;
         }
+
+        public Task<(Rock? Rock, bool Updated)> UpdateRockStatusAsync(int memberId, Guid rockId, RockStatus newStatus)
+        {
+            return _repository.UpdateStatusAsync(memberId, rockId, newStatus);
+        }
     }
 }

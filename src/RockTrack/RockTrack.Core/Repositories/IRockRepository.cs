@@ -8,5 +8,6 @@ namespace RockTrack.Core.Repositories
     {
         Task<IReadOnlyList<Rock>> GetByMemberAsync(int memberId, RockStatus? status);
         Task AddAsync(Rock rock);
+        Task<(Rock? Rock, bool Updated)> UpdateStatusAsync(int memberId, Guid rockId, RockStatus newStatus);
     }
 }

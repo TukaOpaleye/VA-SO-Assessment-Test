@@ -16,8 +16,9 @@ namespace RockTrack.Api
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(
-                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)));
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)));  //enum conversions
+            builder.Services.AddProblemDetails();
+
             builder.Services.AddOpenApi();
 
             // Registration of services
@@ -25,6 +26,9 @@ namespace RockTrack.Api
             builder.Services.AddScoped<IRockService, RockService>();
 
             var app = builder.Build();
+
+            app.UseExceptionHandler(); //first in pipeline to catch exceptions and return problem details
+            app.UseStatusCodePages();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

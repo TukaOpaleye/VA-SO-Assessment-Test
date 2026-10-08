@@ -20,5 +20,17 @@ namespace RockTrack.Core
         public int MemberId { get; }
         public RockStatus Status { get; private set; }
         public RockCategory Category { get; }
+
+        // Status transitions: Only pending to completed & pending to missed are allowed
+        public bool TryTransitionTo(RockStatus newStatus)
+        {
+            if (Status != RockStatus.Pending || newStatus == RockStatus.Pending)
+            {
+                return false;
+            }
+
+            Status = newStatus;
+            return true;
+        }
     }
 }

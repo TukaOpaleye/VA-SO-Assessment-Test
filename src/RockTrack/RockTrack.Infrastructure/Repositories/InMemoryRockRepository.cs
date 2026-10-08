@@ -31,5 +31,20 @@ namespace RockTrack.Infrastructure.Repositories
             }
             return Task.CompletedTask;
         }
+
+        // Find, ownership check and transition run under one lock to avoid check-then-act races
+        public Task<(Rock? Rock, bool Updated)> UpdateStatusAsync(int memberId, Guid rockId, RockStatus newStatus)
+        {
+            lock (_lock)
+            {
+                if (!_rocks.TryGetValue(rockId, out var rock) || rock.MemberId != memberId)
+                {
+                    return Task.FromResult<(Rock?, bool)>((null, false));
+                }
+
+                var updated = rock.TryTransitionTo(newStatus);
+                return Task.FromResult<(Rock?, bool)>((rock, updated));
+            }
+        }
     }
 }
