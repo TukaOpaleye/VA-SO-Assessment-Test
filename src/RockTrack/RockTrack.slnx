@@ -2,4 +2,5 @@
   <Project Path="RockTrack.Api/RockTrack.Api.csproj" />
   <Project Path="RockTrack.Core/RockTrack.Core.csproj" />
   <Project Path="RockTrack.Infrastructure/RockTrack.Infrastructure.csproj" />
+  <Project Path="RockTrack.Test/RockTrack.Tests.csproj" Id="5df43bf3-1ee9-4e37-8a1c-3cef227e97df" />
 </Solution>

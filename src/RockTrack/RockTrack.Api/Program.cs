@@ -1,4 +1,8 @@
 
+using RockTrack.Core.Repositories;
+using RockTrack.Core.Services;
+using RockTrack.Infrastructure.Repositories;
+
 namespace RockTrack.Api
 {
     public class Program
@@ -12,6 +16,10 @@ namespace RockTrack.Api
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            // Registration of services
+            builder.Services.AddSingleton<IRockRepository, InMemoryRockRepository>();
+            builder.Services.AddScoped<IRockService, RockService>();
 
             var app = builder.Build();
 
