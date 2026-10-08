@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using RockTrack.Api.Dto;
 using RockTrack.Core;
@@ -19,14 +20,14 @@ namespace RockTrack.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<RockResponseDto>>> GetRocks(int memberId, [FromQuery] RockStatus? status)
+        public async Task<ActionResult<IReadOnlyList<RockResponseDto>>> GetRocks([Range(1, int.MaxValue, ErrorMessage = "memberId must be a positive number.")] int memberId, [FromQuery] RockStatus? status)
         {
             var rocks = await _rockService.GetRocksAsync(memberId, status);
             return Ok(rocks.Select(RockResponseDto.FromRock).ToList());
         }
 
         [HttpPost]
-        public async Task<ActionResult<RockResponseDto>> CreateRock(int memberId, CreateRockDto request)
+        public async Task<ActionResult<RockResponseDto>> CreateRock([Range(1, int.MaxValue, ErrorMessage = "memberId must be a positive number.")] int memberId, CreateRockDto request)
         {
             var rock = await _rockService.CreateRockAsync(memberId, request.Title, request.Category, request.DueDate, request.Note);
 
@@ -34,7 +35,7 @@ namespace RockTrack.Api.Controllers
         }
 
         [HttpPatch("{rockId:guid}")]
-        public async Task<ActionResult<RockResponseDto>> UpdateRock(int memberId, Guid rockId, UpdateRockDto request)
+        public async Task<ActionResult<RockResponseDto>> UpdateRock([Range(1, int.MaxValue, ErrorMessage = "memberId must be a positive number.")] int memberId, Guid rockId, UpdateRockDto request)
         {
             var (rock, updated) = await _rockService.UpdateRockStatusAsync(memberId, rockId, request.Status);
 
