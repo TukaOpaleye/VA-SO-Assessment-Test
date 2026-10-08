@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RockTrack.Api.Dto;
 using RockTrack.Core;
 using RockTrack.Core.Services;
 
@@ -18,15 +19,18 @@ namespace RockTrack.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetRocks(int memberId, [FromQuery] RockStatus? status)
+        public async Task<ActionResult<IReadOnlyList<RockResponseDto>>> GetRocks(int memberId, [FromQuery] RockStatus? status)
         {
             var rocks = await _rockService.GetRocksAsync(memberId, status);
-            return Ok(rocks);
+            return Ok(rocks.Select(RockResponseDto.FromRock).ToList());
         }
 
+        [HttpPost]
+        public async Task<ActionResult<RockResponseDto>> CreateRock(int memberId, CreateRockDto request)
+        {
+            var rock = await _rockService.CreateRockAsync(memberId, request.Title, request.Category, request.DueDate, request.Note);
 
-
-
-
+            return Created($"/members/{memberId}/rocks/{rock.Id}", RockResponseDto.FromRock(rock));
+        }
     }
 }

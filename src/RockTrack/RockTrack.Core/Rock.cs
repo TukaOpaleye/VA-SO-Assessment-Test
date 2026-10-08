@@ -2,9 +2,9 @@ namespace RockTrack.Core
 {
     public sealed class Rock
     {
-        public Rock(int id, int memberId, string title, RockCategory category, DateOnly dueDate, string? note = null)
+        public Rock(int memberId, string title, RockCategory category, DateOnly dueDate, string? note = null)
         {
-            Id = id;
+            Id = Guid.NewGuid();
             MemberId = memberId;
             Title = title.Trim();
             Category = category;
@@ -13,7 +13,7 @@ namespace RockTrack.Core
             Status = RockStatus.Pending;
         }
 
-        public int Id { get; }
+        public Guid Id { get; }
         public string Title { get; }
         public DateOnly DueDate { get; }
         public string? Note { get; }

@@ -7,5 +7,6 @@ namespace RockTrack.Core.Repositories
     public interface IRockRepository
     {
         Task<IReadOnlyList<Rock>> GetByMemberAsync(int memberId, RockStatus? status);
+        Task AddAsync(Rock rock);
     }
 }

@@ -6,9 +6,9 @@ using RockTrack.Core.Repositories;
 
 namespace RockTrack.Infrastructure.Repositories
 {
-    public class InMemoryRockRepository : IRockRepository
+    public sealed class InMemoryRockRepository : IRockRepository
     {
-        private readonly Dictionary<int, Rock> _rocks = new();
+        private readonly Dictionary<Guid, Rock> _rocks = new();
         private readonly Lock _lock = new();
 
         public Task<IReadOnlyList<Rock>> GetByMemberAsync(int memberId, RockStatus? status)
@@ -21,6 +21,15 @@ namespace RockTrack.Infrastructure.Repositories
                     .ToList();
                 return Task.FromResult(rocks);
             }
+        }
+
+        public Task AddAsync(Rock rock)
+        {
+            lock (_lock)
+            {
+                _rocks.Add(rock.Id, rock);
+            }
+            return Task.CompletedTask;
         }
     }
 }

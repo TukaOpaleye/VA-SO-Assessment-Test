@@ -1,4 +1,5 @@
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using RockTrack.Core.Repositories;
 using RockTrack.Core.Services;
 using RockTrack.Infrastructure.Repositories;
@@ -13,7 +14,9 @@ namespace RockTrack.Api
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(
+                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)));
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 

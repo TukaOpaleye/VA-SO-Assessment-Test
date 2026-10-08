@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dto\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RockTrack.Core\RockTrack.Core.csproj" />
     <ProjectReference Include="..\RockTrack.Infrastructure\RockTrack.Infrastructure.csproj" />
   </ItemGroup>
