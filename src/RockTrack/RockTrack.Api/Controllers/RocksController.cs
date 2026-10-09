@@ -10,12 +10,10 @@ namespace RockTrack.Api.Controllers
     [Route("members/{memberId}/rocks")]
     public class RocksController : ControllerBase
     {
-        private readonly ILogger<RocksController> _logger;
         private readonly IRockService _rockService;
 
-        public RocksController(IRockService rockService, ILogger<RocksController> logger)
+        public RocksController(IRockService rockService)
         {
-            _logger = logger;
             _rockService = rockService;
         }
 

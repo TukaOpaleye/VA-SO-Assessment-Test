@@ -19,7 +19,7 @@ I will assume "notes" is a property of the Rock classl and that for a Career Cat
 
 
 Design Tradeoffs
-1. I have appeoached the code organisation from a liqtweight Hexagonal Architecture approach where in teh solution project RockTrack.Core 
+1. I have approached the code organisation from a liqtweight Hexagonal Architecture approach where in the solution all solutions point inward into project RockTrack.Core. **ELABORATE** 
 
 2. To implement teh in-memory collection as a sigleton and shared by requests, I need to consider thread safety. ConcurrencyDictionary seesm like a scallable fit but it turns out that ConcurrencyDictionary only locks part of the items in the dictionary which means that objects in the collection can still be changed and I would need to implement locking in a write scenario. The more aggressive mechanism in using a plain Dictionary + lock (neither read or write if there is a lock) is a strong guarantee and avoid designing locking mechanisms for write scenarios. So Dictionary + lock though less scallable is prefered.
 
@@ -27,9 +27,19 @@ Design Tradeoffs
 
 4. In "Input validation requirements" (2), the requirement "Due date must be in the past" is not specifc becasue I use DateOnly type. I will assume that past mean the day before. 
 
-5. Added a data seeder in RockTracker.Api project to pre-seed the im-memory collection to facilitate testing.
+5. Added a data seeder in RockTracker.Api project to pre-seed the in-memory collection to facilitate testing.
 
+6. I have added detaisl of my approch to section 3  below "Strategy for Dealing with Section 3"
 
+7. In section 5, for easier implementation, I am going to use Serilog which I have used before and offers easy to configuration of the multiple output types. For this I need teh following packages:
+	-Serilog.AspNetCore in the API project -  Hosting integration, request logging, console sink, CompactJsonFormatter, reading from configuration (all included)
+	-Microsoft.Extensions.Logging.Abstractions in the Core project - ILogger<T> for RockService  - interfaces only, no Serilog in Core so this keeps the pure separation with other projects. With the interface we can pass details from RockService in the logging scheme.
+	A series of Postman test show the correlation Id omming back in teh request. Also I can see output in Visual Studio output console window: 
+		{"@t":"2026-10-09T20:37:16.0668781Z","@mt":"Found {RockCount} rocks for member {MemberId} with status filter {StatusFilter}","@l":"Debug","@tr":"25bebf688b399f1fa84be012596f8e87","@sp":"9af3ae5b91e09e4e","RockCount":3,"MemberId":1,"StatusFilter":null,"SourceContext":"RockTrack.Core.Services.RockService","ActionId":"98840ee0-58ec-4c96-a25c-adc356fda5f2","ActionName":"RockTrack.Api.Controllers.RocksController.GetRocks (RockTrack.Api)","RequestId":"0HNP68JGDRSHR:00000001","RequestPath":"/members/1/rocks","ConnectionId":"0HNP68JGDRSHR","CorrelationId":"so-BEA-00001","Application":"RockTrack"}
+		{"@t":"2026-10-09T20:37:16.0684350Z","@mt":"HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms","@r":["3.0071"],"@tr":"25bebf688b399f1fa84be012596f8e87","@sp":"9af3ae5b91e09e4e","RequestQuery":"","RequestMethod":"GET","RequestPath":"/members/1/rocks","StatusCode":200,"Elapsed":3.0071,"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","CorrelationId":"so-BEA-00001","RequestId":"0HNP68JGDRSHR:00000001","ConnectionId":"0HNP68JGDRSHR","Application":"RockTrack"}
+
+	
+	
 
 
 
@@ -65,7 +75,7 @@ Other notes:
 Strategy for Dealing with Section 3
 -----------------------------------
 
-On a high level I start with a crude implementation of rules (Stage 1) with rules in RockCategoryValidator class with unit tests for one Category. Moving rules to RockCategoryValidator which implements IRockCategoryValidator allows us to use DI and inject into teh existing code and faciliates testing. At this point we have taken a step toward strategy pattern while still in the old implementation. After all rules are captured in code (RockCategoryValidator) one category at a time  (Health (simplest), Career, then Revenue) with passing tests, we then extend the implemenation (Stage 2)fully use the Startegy Pattern for teh next category.
+On a high level I start with a crude implementation of the rules (Stage 1) implementing rules in RockCategoryValidator class with unit tests for one Category Health. Moving rules to RockCategoryValidator which implements IRockCategoryValidator allows me to use DI and inject into the existing code - this also faciliates testing. At this point we have taken a step toward strategy pattern while still in the old implementation. After all rules are captured in code (RockCategoryValidator) one category at a time  (Health (simplest), Career, then Revenue) with passing tests, we then extend the implemenation (Stage 2)fully use the Startegy Pattern for teh next category.
 DI in program.cs is updated with  IRockCategoryValidator.
  
  Stage 1: 

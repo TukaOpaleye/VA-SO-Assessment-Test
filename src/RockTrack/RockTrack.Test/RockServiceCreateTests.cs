@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using RockTrack.Core;
 using RockTrack.Core.Services;
 using RockTrack.Core.Validation;
@@ -16,7 +17,7 @@ namespace RockTrack.Tests
         {
             _repository = new InMemoryRockRepository();
             
-            _sut = new RockService(_repository, RockCategoryValidatorTests.CreateValidator(), TimeProvider.System);
+            _sut = new RockService(_repository, RockCategoryValidatorTests.CreateValidator(), TimeProvider.System, NullLogger<RockService>.Instance);
         }
 
         [Test]
@@ -66,7 +67,7 @@ namespace RockTrack.Tests
         public async Task CreateRock_RevenueUsesClockForCurrentQuarter(string clockDate, bool expectedSuccess)
         {
             var clock = new FixedTimeProvider(new DateTimeOffset(DateTime.Parse(clockDate).AddHours(12), TimeSpan.Zero));
-            var sut = new RockService(_repository, RockCategoryValidatorTests.CreateValidator(), clock);
+            var sut = new RockService(_repository, RockCategoryValidatorTests.CreateValidator(), clock, NullLogger<RockService>.Instance);
 
             var result = await sut.CreateRockAsync(1, "Close deal", RockCategory.Revenue, new DateOnly(2027, 1, 15), null);
 
