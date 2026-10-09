@@ -32,6 +32,27 @@ Azure Front Door is a global edge networkk like Clouflare that provide services 
 
 
  
+---------------------------------
+
+Assumptions:
+1. A mention of a note field appears for the first time in section 3. It is not immediately clear if this refers to a property of a  Rock as such property is not mentioned in section 1 when describing a Rock object.
+I will assume "notes" is a property of the Rock classl and that for a Career Category, the active rule checks to see if the Note field   
+
+2. The spec see,s to describe a single frontend client where it referes to teh shared API key. For production, For production, requirement 8's reference to "external clients" (Section 8) suggests multiple consumers/clients . I will assume one single client for this API.  
+
+
+
+Design Tradeoff
+1. I have appeoached the code organisation from a liqtweight Hexagonal Architecture approach where in teh solution project RockTrack.Core 
+
+2. To implement teh in-memory collection as a sigleton and shared by requests, I need to consider thread safety. ConcurrencyDictionary seesm like a scallable fit but it turns out that ConcurrencyDictionary only locks part of the items in the dictionary which means that objects in the collection can still be changed and I would need to implement locking in a write scenario. The more aggressive mechanism in using a plain Dictionary + lock (neither read or write if there is a lock) is a strong guarantee and avoid designing locking mechanisms for write scenarios. So Dictionary + lock though less scallable is prefered.
+
+3. In "Input validation requirements" (2), memberId was implemented as an int (as it is on the jsonplaceholder endpoint). Consequently, I will apply an equivalent requirement that member Id be a positive number instead.
+
+4. In "Input validation requirements" (2), the requirement "Due date must be in the past" is not specifc becasue I use DateOnly type. I will assume that past mean the day before. 
+
+5. Added a data seeder in RockTracker.Api project to pre-seed the im-memory collection to facilitate testing.
+
 
 
 
@@ -41,5 +62,17 @@ Azure Front Door is a global edge networkk like Clouflare that provide services 
 
 Security Concerns
 
-1. One Key for all Clients (implied by the necessity of storage of a single) is a security concern as all members can use it to access members potentially not belonging to them.
+1. If the App were multi-client, using one Key for all Clients (implied by the necessity of storage of a single) is a security concern as all members can use it to access members potentially not belonging to them.
 2. 
+
+
+
+
+
+If I had more time, I would: 
+1. The Input Validation fixes were implemented but there are a few edge cases where teh validation messages returned malformed JSON indicating there is an issue withe teh validatioin engine. As I result I get validation messages like the below. This is likely resolvable but requires more testing.
+"$.dueDate": ["…could not be converted to System.DateOnly…"]  - an error message when I validate DueDate. 
+
+Other notes:
+1. test url is https://localhost:7242/members/1/rocks
+

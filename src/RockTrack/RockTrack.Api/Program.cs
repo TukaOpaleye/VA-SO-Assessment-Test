@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using RockTrack.Api.Development;
 using RockTrack.Core.Repositories;
 using RockTrack.Core.Services;
+using RockTrack.Core.Validation;
 using RockTrack.Infrastructure.Repositories;
 
 namespace RockTrack.Api
@@ -43,6 +44,7 @@ namespace RockTrack.Api
 
             // Registration of services
             builder.Services.AddSingleton<IRockRepository, InMemoryRockRepository>();
+            builder.Services.AddTransient<IRockCategoryValidator, RockCategoryValidator>(); // as Validator is stateless
             builder.Services.AddScoped<IRockService, RockService>();
 
             if (builder.Environment.IsDevelopment())

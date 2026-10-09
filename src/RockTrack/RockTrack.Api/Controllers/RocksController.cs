@@ -33,9 +33,23 @@ namespace RockTrack.Api.Controllers
             [PositiveId] int memberId,
             CreateRockDto request)
         {
-            var rock = await _rockService.CreateRockAsync(memberId, request.Title, request.Category, request.DueDate, request.Note);
+            var result = await _rockService.CreateRockAsync(memberId, request.Title, request.Category, request.DueDate, request.Note);
 
-            return Created($"/members/{memberId}/rocks/{rock.Id}", RockResponseDto.FromRock(rock));
+            if (!result.IsSuccess)
+            {
+                // Same ValidationProblemDetails 400 shape as the data annotation errors
+                foreach (var (key, messages) in result.Errors)
+                {
+                    foreach (var message in messages)
+                    {
+                        ModelState.AddModelError(key, message);
+                    }
+                }
+
+                return ValidationProblem(ModelState);
+            }
+
+            return Created($"/members/{memberId}/rocks/{result.Rock.Id}", RockResponseDto.FromRock(result.Rock));
         }
 
         [HttpPatch("{rockId:guid}")]
