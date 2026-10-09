@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using RockTrack.Core.Services;
 
 namespace RockTrack.Core.Repositories
 {
@@ -8,6 +9,6 @@ namespace RockTrack.Core.Repositories
     {
         Task<IReadOnlyList<Rock>> GetByMemberAsync(int memberId, RockStatus? status);
         Task AddAsync(Rock rock);
-        Task<(Rock? Rock, bool Updated)> UpdateStatusAsync(int memberId, Guid rockId, RockStatus newStatus);
+        Task<UpdateRockStatusResult> UpdateStatusAsync(int memberId, Guid rockId, RockStatus newStatus);
     }
 }

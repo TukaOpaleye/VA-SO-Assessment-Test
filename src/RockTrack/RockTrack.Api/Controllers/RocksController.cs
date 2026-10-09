@@ -58,22 +58,21 @@ namespace RockTrack.Api.Controllers
             Guid rockId,
             UpdateRockDto request)
         {
-            var (rock, updated) = await _rockService.UpdateRockStatusAsync(memberId, rockId, request.Status);
+            var result = await _rockService.UpdateRockStatusAsync(memberId, rockId, request.Status);
 
-            if (rock is null)
+            return result.Outcome switch
             {
-                return Problem(statusCode: StatusCodes.Status404NotFound, 
+                UpdateRockStatusOutcome.NotFound => Problem(statusCode: StatusCodes.Status404NotFound,
                     title: "Rock not found",
-                    detail: $"Rock '{rockId}' does not exist for member {memberId}.");
-            }
+                    detail: $"Rock '{rockId}' does not exist for member {memberId}."),
 
-            if (!updated)
-            {
-                return Problem(statusCode: StatusCodes.Status422UnprocessableEntity, title: "Invalid status transition",
-                    detail: $"Cannot change status from '{rock.Status.ToString().ToLowerInvariant()}' to '{request.Status.ToString().ToLowerInvariant()}'. Only pending rocks can be marked as completed or missed.");
-            }
+                UpdateRockStatusOutcome.InvalidTransition => Problem(statusCode: StatusCodes.Status422UnprocessableEntity,
+                    title: "Invalid status transition",
+                    detail: $"Cannot change status from '{result.Rock!.Status.ToString().ToLowerInvariant()}' to " +
+                            $"'{request.Status.ToString().ToLowerInvariant()}'. Only pending rocks can be marked as completed or missed."),
 
-            return Ok(RockResponseDto.FromRock(rock));
+                _ => Ok(RockResponseDto.FromRock(result.Rock!))
+            };
         }
     }
 }
