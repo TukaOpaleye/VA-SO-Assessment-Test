@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RockTrack.Api.Dto;
 using RockTrack.Api.Validation;
@@ -7,6 +8,7 @@ using RockTrack.Core.Services;
 namespace RockTrack.Api.Controllers
 {
     [ApiController]
+    [Authorize] // every action requires a valid X-Api-Key (ApiKey scheme)
     [Route("members/{memberId}/rocks")]
     public class RocksController : ControllerBase
     {

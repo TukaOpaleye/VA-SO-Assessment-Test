@@ -19,6 +19,7 @@ I will assume "notes" is a property of the Rock classl and that for a Career Cat
 
 
 Design Tradeoffs
+----------------
 1. I have approached the code organisation from a liqtweight Hexagonal Architecture approach where in the solution all solutions point inward into project RockTrack.Core. **ELABORATE** 
 
 2. To implement teh in-memory collection as a sigleton and shared by requests, I need to consider thread safety. ConcurrencyDictionary seesm like a scallable fit but it turns out that ConcurrencyDictionary only locks part of the items in the dictionary which means that objects in the collection can still be changed and I would need to implement locking in a write scenario. The more aggressive mechanism in using a plain Dictionary + lock (neither read or write if there is a lock) is a strong guarantee and avoid designing locking mechanisms for write scenarios. So Dictionary + lock though less scallable is prefered.
@@ -31,18 +32,27 @@ Design Tradeoffs
 
 6. I have added detaisl of my approch to section 3  below "Strategy for Dealing with Section 3"
 
-7. In section 5, for easier implementation, I am going to use Serilog which I have used before and offers easy to configuration of the multiple output types. For this I need teh following packages:
+7. In section 5 (Structured Logging and Correlation), for easier implementation, I am going to use Serilog which I have used before and offers easy to configuration of the multiple output types. For this I need teh following packages:
 	-Serilog.AspNetCore in the API project -  Hosting integration, request logging, console sink, CompactJsonFormatter, reading from configuration (all included)
 	-Microsoft.Extensions.Logging.Abstractions in the Core project - ILogger<T> for RockService  - interfaces only, no Serilog in Core so this keeps the pure separation with other projects. With the interface we can pass details from RockService in the logging scheme.
-	A series of Postman test show the correlation Id omming back in teh request. Also I can see output in Visual Studio output console window: 
-		{"@t":"2026-10-09T20:37:16.0668781Z","@mt":"Found {RockCount} rocks for member {MemberId} with status filter {StatusFilter}","@l":"Debug","@tr":"25bebf688b399f1fa84be012596f8e87","@sp":"9af3ae5b91e09e4e","RockCount":3,"MemberId":1,"StatusFilter":null,"SourceContext":"RockTrack.Core.Services.RockService","ActionId":"98840ee0-58ec-4c96-a25c-adc356fda5f2","ActionName":"RockTrack.Api.Controllers.RocksController.GetRocks (RockTrack.Api)","RequestId":"0HNP68JGDRSHR:00000001","RequestPath":"/members/1/rocks","ConnectionId":"0HNP68JGDRSHR","CorrelationId":"so-BEA-00001","Application":"RockTrack"}
+	A series of Postman tests show the correlation Id omming back in teh request for PATCH,GET and POST requests. 
+	Also I can see output in Visual Studio output console window as hsown in this sample: 
+
 		{"@t":"2026-10-09T20:37:16.0684350Z","@mt":"HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms","@r":["3.0071"],"@tr":"25bebf688b399f1fa84be012596f8e87","@sp":"9af3ae5b91e09e4e","RequestQuery":"","RequestMethod":"GET","RequestPath":"/members/1/rocks","StatusCode":200,"Elapsed":3.0071,"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","CorrelationId":"so-BEA-00001","RequestId":"0HNP68JGDRSHR:00000001","ConnectionId":"0HNP68JGDRSHR","Application":"RockTrack"}
 
+8. In section 6, (API Key Authentication), I have taken a strict interpretation of "Protect all endpoints with API key authentication" to include  /openapi/v1.json for display openapi. hence this endpoint cannot be reached in teh browser. I will include teh endpoint as part of the Postman collection which provide teh target API-key in requests.  
 	
-	
 
 
+Notes
+-----
 
+Section 6: API Key Authentication
+
+Postman and the API key
+ For simplicity, the Postman collection sets X-Api-Key once at collection level with and every request inherits it. This is a development-only key used for local testing; it must match the key configured for the API (see Running locally).
+
+The API itself never hardcodes the key: it's read from configuration which in Azure  would be Azure Key Vault in production.
 
 
 
@@ -59,10 +69,8 @@ If I had more time, I would:
 
 1. Refactor the tests - they can be collapsed into test cases
 
-2. The Input Validation fixes were implemented but there are a few edge cases where teh validation messages returned malformed JSON indicating there is an issue withe teh validatioin engine. As I result I get validation messages like the below. This is likely resolvable but requires more testing.
-"$.dueDate": ["…could not be converted to System.DateOnly…"]  - an error message when I validate DueDate. 
-
-
+2. The Input Validation fixes were implemented and meets all the spec criteria but there are a few edge cases where the validation messages returned malformed JSON indicating there is an issue withe the validation engine. As I result I get validation messages like the below. This is likely resolvable but requires more testing. - example of an error message when I validate DueDate. 
+	"$.dueDate": ["…could not be converted to System.DateOnly…"]  
 
 
 Other notes:
@@ -115,7 +123,7 @@ Cloud Deployment and Arquitecture
 ----------------------------------
 
 1. Choice of Azure Compute Service:
-
+-----------------------------------
 
 I recommend Azure Container Apps (ACA) mainly because the scenario describes a small service with weekly commitments of rocks - this indicates that we will likely have daytime spikes and an overnight lull in demand with idle periods. Also the word small seems to indicate a lower membership number initially. ACA  can scale to zero when idle and incure no compute costs and can scale out when we have weekly spikes.
 Although development is constrained to using an in-memory collection, a production application would certain use database hence scaling down to zero is a real choice e.g. overnight and during the weekend. 
@@ -131,7 +139,8 @@ Azure App Service would be a great contender except for the cost as it only only
 Azure functions are ideal for event handling scenarios and HTTP is one teh events supported but has a contrived support for APIs (e.g. limited ASP.NET Core pipeline) as it is not designed from teh ground up to handle HTTP. 
 
 
-2. Exposing the API to external clients 
+2. Exposing the API to external clients: 
+---------------------------------------
 
 If the API is exposed directly and publiclly, this would cheap and simple and would scale all teh way down to zero but it would  would also expose the API to
 - uncontroled rate usages and application level abuse that may overwhelm teh backedn 
@@ -143,4 +152,5 @@ and would be sufficient for most applications although it does not porovide comp
 Azure Front Door is a global edge networkk like Clouflare that provide services like Caching/CDN, DDoS absorption. It solves a different and complementary problem to APIM  APIM ussually sits in tamden with it.  Along with the added protection means additional costs. Azure Front Door adoption is ussually driven by business need - for example revenue critical availability, DDoS protection and service provided across multiple globally across multiple countries. For an initial release of a new service APIM would be sufficient.     
 
 
-3. CI/CD pipeline strategy
+3. CI/CD pipeline strategy:
+--------------------------

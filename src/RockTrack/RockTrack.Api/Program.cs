@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using RockTrack.Api.Authentication;
 using RockTrack.Api.Development;
 using RockTrack.Api.Middleware;
 using RockTrack.Core.Repositories;
@@ -20,7 +21,7 @@ namespace RockTrack.Api
     {
         public static void Main(string[] args)
         {
-            // Bootstrap logger: startup failures are logged as JSON too, before configuration is read
+            // Bootstrap logger: startup failures are logged as JSON, before configuration is read
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console(new CompactJsonFormatter())
                 .CreateBootstrapLogger();
@@ -72,7 +73,7 @@ namespace RockTrack.Api
                 // Registration of services
                 builder.Services.AddSingleton<IRockRepository, InMemoryRockRepository>();
 
-                // Category rules: one class per category (strategy pattern), injected as IEnumerable<ICategoryRule>
+                // Category rules for  IEnumerable<ICategoryRule>
                 builder.Services.AddTransient<ICategoryRule, RevenueRule>();
                 builder.Services.AddTransient<ICategoryRule, HealthRule>();
                 builder.Services.AddTransient<ICategoryRule, CareerRule>();
@@ -80,6 +81,18 @@ namespace RockTrack.Api
                 builder.Services.AddTransient<IRockCategoryValidator, RockCategoryValidator>();
 
                 builder.Services.AddScoped<IRockService, RockService>();
+
+                // API key authentication: the key comes from configuration ("ApiKeyAuthentication:ApiKey").
+                builder.Services.AddAuthentication(ApiKeyAuthenticationOptions.SchemeName)
+                    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationOptions.SchemeName,
+                        options => builder.Configuration.GetSection("ApiKeyAuthentication").Bind(options));
+
+                // Fail fast: the app won't start without a configured key
+                builder.Services.AddOptions<ApiKeyAuthenticationOptions>(ApiKeyAuthenticationOptions.SchemeName)
+                    .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey), "ApiKeyAuthentication:ApiKey must be configured.")
+                    .ValidateOnStart();
+
+                builder.Services.AddAuthorization();
 
                 if (builder.Environment.IsDevelopment())
                 {
@@ -108,11 +121,12 @@ namespace RockTrack.Api
                 // Configure the HTTP request pipeline.
                 if (app.Environment.IsDevelopment())
                 {
-                    app.MapOpenApi();
+                    app.MapOpenApi().RequireAuthorization(); // protected like every other endpoint
                 }
 
                 app.UseHttpsRedirection();
 
+                app.UseAuthentication(); // reads X-Api-Key
                 app.UseAuthorization();
 
 
