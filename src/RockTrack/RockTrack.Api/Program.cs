@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using RockTrack.Api.Development;
 using RockTrack.Core.Repositories;
 using RockTrack.Core.Services;
 using RockTrack.Infrastructure.Repositories;
@@ -43,6 +44,11 @@ namespace RockTrack.Api
             // Registration of services
             builder.Services.AddSingleton<IRockRepository, InMemoryRockRepository>();
             builder.Services.AddScoped<IRockService, RockService>();
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddHostedService<DevSeedHostedService>();
+            }
 
             var app = builder.Build();
 
