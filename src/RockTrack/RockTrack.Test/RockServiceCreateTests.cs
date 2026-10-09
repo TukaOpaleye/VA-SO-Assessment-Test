@@ -58,5 +58,23 @@ namespace RockTrack.Tests
                 Assert.That(result.Errors.Keys, Is.EquivalentTo(new[] { "note" }));
             }
         }
+
+        // Same rock, two clocks, opposite results: proves the service reads "today" from the clock
+        [TestCase("2026-10-09", false)] // Q4 2026: January is next quarter
+        [TestCase("2027-01-05", true)]  // Q1 2027: January is the current quarter
+        public async Task CreateRock_RevenueUsesClockForCurrentQuarter(string clockDate, bool expectedSuccess)
+        {
+            var clock = new FixedTimeProvider(new DateTimeOffset(DateTime.Parse(clockDate).AddHours(12), TimeSpan.Zero));
+            var sut = new RockService(_repository, new RockCategoryValidator(), clock);
+
+            var result = await sut.CreateRockAsync(1, "Close deal", RockCategory.Revenue, new DateOnly(2027, 1, 15), null);
+
+            Assert.That(result.IsSuccess, Is.EqualTo(expectedSuccess));
+        }
+
+        private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
+        {
+            public override DateTimeOffset GetUtcNow() => now;
+        }
     }
 }

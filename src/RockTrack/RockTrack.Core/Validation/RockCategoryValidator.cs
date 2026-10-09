@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace RockTrack.Core.Validation
 {
     // Initial version: one if/else branch per category. To be refactored to the strategy pattern.
@@ -8,7 +10,17 @@ namespace RockTrack.Core.Validation
         {
             var errors = new Dictionary<string, string[]>();
 
-            if (category == RockCategory.Health)
+            if (category == RockCategory.Revenue)
+            {
+                var (quarterStart, quarterEnd) = GetQuarter(today);
+
+                if (dueDate < quarterStart || dueDate > quarterEnd)
+                {
+                    errors["dueDate"] = [$"dueDate must fall within the current quarter " +
+                        $"({Format(quarterStart)} to {Format(quarterEnd)}) for revenue rocks."];
+                }
+            }
+            else if (category == RockCategory.Health)
             {
                 if (title.Trim().Length < 10)
                 {
@@ -26,5 +38,15 @@ namespace RockTrack.Core.Validation
 
             return errors;
         }
+
+        // Calendar quarters: Jan–Mar, Apr–Jun, Jul–Sep, Oct–Dec
+        private static (DateOnly Start, DateOnly End) GetQuarter(DateOnly date)
+        {
+            var firstMonth = (date.Month - 1) / 3 * 3 + 1;   // 1, 4, 7 or 10
+            var start = new DateOnly(date.Year, firstMonth, 1);
+            return (start, start.AddMonths(3).AddDays(-1));
+        }
+
+        private static string Format(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 }

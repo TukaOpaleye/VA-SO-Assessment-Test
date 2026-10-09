@@ -98,5 +98,52 @@ namespace RockTrack.Test
 
             Assert.That(errors.ContainsKey("note"), Is.False);
         }
+
+        //** -- REVENUE Category: due date within the current quarter ---
+        // Today = 2026-10-09 → Q4: 2026-10-01 to 2026-12-31
+
+        [TestCase("2026-10-01")] // first day of quarter
+        [TestCase("2026-10-09")] // today
+        [TestCase("2026-12-31")] // last day of quarter
+        public void Revenue_DueDateInCurrentQuarter_IsValid(string dueDate)
+        {
+            var errors = _sut.Validate("Close deal", RockCategory.Revenue, DateOnly.Parse(dueDate), null, Today);
+
+            Assert.That(errors, Is.Empty);
+        }
+
+        [TestCase("2026-09-30")] // day before quarter
+        [TestCase("2027-01-01")] // day after quarter (across the year boundary)
+        [TestCase("2027-03-31")] // next quarter
+        public void Revenue_DueDateOutsideCurrentQuarter_ReturnsDueDateError(string dueDate)
+        {
+            var errors = _sut.Validate("Close deal", RockCategory.Revenue, DateOnly.Parse(dueDate), null, Today);
+
+            Assert.That(errors.Keys, Is.EquivalentTo(new[] { "dueDate" }));
+        }
+
+        // The quarter is worked out from "today", for every quarter
+        // Heuristic: IF today is A, the due Date B must be in the same quarter as A (expect true) otherwise it's an error (expect false)
+        [TestCase("2026-01-01", "2026-03-31", true)]  // Q1, first day of quarter: last day valid
+        [TestCase("2026-02-15", "2026-04-01", false)] // Q1: next quarter invalid
+        [TestCase("2026-06-30", "2026-04-01", true)]  // Q2, last day: first day of quarter valid - note that the dueDate is before today - this is OK as the spec on speak about due date being in teh quarter. Another rule from teh UI catches this edge case  
+        public void Revenue_QuarterIsWorkedOutFromToday(string today, string dueDate, bool expectedValid)
+        {
+            var errors = _sut.Validate("Close deal", RockCategory.Revenue, DateOnly.Parse(dueDate), null, DateOnly.Parse(today));
+
+            Assert.That(errors.Count == 0, Is.EqualTo(expectedValid));
+        }
+
+        // --- The Revenue rule applies only to Revenue ---
+
+        [TestCase(RockCategory.Health)]
+        [TestCase(RockCategory.Career)]
+        [TestCase(RockCategory.Other)]
+        public void NonRevenueCategory_DueDateOutsideQuarter_HasNoDueDateError(RockCategory category)
+        {
+            var errors = _sut.Validate("Run a half marathon", category, new DateOnly(2027, 6, 1), "a note", Today);
+
+            Assert.That(errors.ContainsKey("dueDate"), Is.False);
+        }
     }
 }
