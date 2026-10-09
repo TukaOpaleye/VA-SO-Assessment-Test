@@ -1,5 +1,6 @@
 using RockTrack.Core;
 using RockTrack.Core.Validation;
+using RockTrack.Core.Validation.CategoryRules;
 
 namespace RockTrack.Test
 {
@@ -15,8 +16,9 @@ namespace RockTrack.Test
             _sut = CreateValidator();
         }
 
-        // The only line that changes when the strategy pattern arrives
-        private static IRockCategoryValidator CreateValidator() => new RockCategoryValidator();
+        // All the category rules, as registered in Program.cs
+        internal static IRockCategoryValidator CreateValidator() =>
+            new RockCategoryValidator([new RevenueRule(), new HealthRule(), new CareerRule(), new OtherRule()]);
 
         //** --- HEALTH category : title at least 10 characters ---
 
@@ -144,6 +146,34 @@ namespace RockTrack.Test
             var errors = _sut.Validate("Run a half marathon", category, new DateOnly(2027, 6, 1), "a note", Today);
 
             Assert.That(errors.ContainsKey("dueDate"), Is.False);
+        }
+
+        //** -- Dispatcher (strategy selection) ---
+
+        [Test]
+        public void Validate_CategoryWithNoRule_Throws()
+        {
+            var sut = new RockCategoryValidator([new HealthRule()]);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                sut.Validate("Close deal", RockCategory.Revenue, Today, null, Today)); //RockCategory.Revenue <!=>  HealthRule()
+        }
+
+        [Test]
+        public void Constructor_TwoRulesForSameCategory_Throws()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new RockCategoryValidator([new HealthRule(), new HealthRule()]));
+        }
+
+        [Test]
+        public void EveryCategory_HasARule()
+        {
+            // Catches a new enum value added without its rule class (checks CreateValidator, not Program.cs)
+            foreach (var category in Enum.GetValues<RockCategory>())
+            {
+                Assert.DoesNotThrow(() => _sut.Validate("A valid rock title", category, Today, "a note", Today), $"{category}");
+            }
         }
     }
 }

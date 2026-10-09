@@ -7,6 +7,7 @@ using RockTrack.Api.Development;
 using RockTrack.Core.Repositories;
 using RockTrack.Core.Services;
 using RockTrack.Core.Validation;
+using RockTrack.Core.Validation.CategoryRules;
 using RockTrack.Infrastructure.Repositories;
 
 namespace RockTrack.Api
@@ -44,7 +45,14 @@ namespace RockTrack.Api
 
             // Registration of services
             builder.Services.AddSingleton<IRockRepository, InMemoryRockRepository>();
-            builder.Services.AddTransient<IRockCategoryValidator, RockCategoryValidator>(); // as Validator is stateless
+
+            // Category rules: one class per category (strategy pattern), injected as IEnumerable<ICategoryRule>
+            builder.Services.AddTransient<ICategoryRule, RevenueRule>();
+            builder.Services.AddTransient<ICategoryRule, HealthRule>();
+            builder.Services.AddTransient<ICategoryRule, CareerRule>();
+            builder.Services.AddTransient<ICategoryRule, OtherRule>();
+            builder.Services.AddTransient<IRockCategoryValidator, RockCategoryValidator>();
+
             builder.Services.AddScoped<IRockService, RockService>();
 
             if (builder.Environment.IsDevelopment())
