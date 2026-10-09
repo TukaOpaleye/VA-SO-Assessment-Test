@@ -45,5 +45,18 @@ namespace RockTrack.Tests
                 Assert.That(result.Errors.Keys, Is.EquivalentTo(new[] { "title" }));
             });
         }
+
+        [Test]
+        public async Task CreateRock_CareerWithoutNote_ReturnsNoteError()
+        {
+            // Also guards against title and note being swapped when the service calls the validator
+            var result = await _sut.CreateRockAsync(1, "Get promoted", RockCategory.Career, new DateOnly(2027, 3, 1), null);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.IsSuccess, Is.False);
+                Assert.That(result.Errors.Keys, Is.EquivalentTo(new[] { "note" }));
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 [
   { "memberId": 1, "title": "Close Q4 enterprise deal", "category": "revenue", "dueDate": "2026-12-15" },
-  { "memberId": 1, "title": "Run a 10k",                 "category": "health",  "dueDate": "2026-11-01", "note": "Sub 55 min" },
-  { "memberId": 1, "title": "Finish AWS certification",  "category": "career",  "dueDate": "2026-09-30", "status": "completed" },
+  { "memberId": 1, "title": "01234567890123 (>10 Text)", "category": "health",  "dueDate": "2026-11-01", "note": "Sub 55 min" },
+  { "memberId": 1, "title": "Finish AWS certification",  "category": "career",  "dueDate": "2026-09-30", "note": "Test Note", "status": "completed" },
   { "memberId": 2, "title": "Read 2 books",              "category": "other",   "dueDate": "2026-09-15", "status": "missed" },
   { "memberId": 2, "title": "Lead a design review",      "category": "career",  "dueDate": "2026-11-20", "note": "engineering", "status": "pending" }
 ]

@@ -15,6 +15,14 @@ namespace RockTrack.Core.Validation
                     errors["title"] = ["title must be at least 10 characters for health rocks."];
                 }
             }
+            else if (category == RockCategory.Career)
+            {
+                // Required: whitespace-only doesn't explain anything
+                if (string.IsNullOrWhiteSpace(note))
+                {
+                    errors["note"] = ["note is required for career rocks, explaining why this matters."];
+                }
+            }
 
             return errors;
         }
