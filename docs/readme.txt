@@ -121,7 +121,7 @@ Design Tradeoffs
 
 		{"@t":"2026-10-09T20:37:16.0684350Z","@mt":"HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms","@r":["3.0071"],"@tr":"25bebf688b399f1fa84be012596f8e87","@sp":"9af3ae5b91e09e4e","RequestQuery":"","RequestMethod":"GET","RequestPath":"/members/1/rocks","StatusCode":200,"Elapsed":3.0071,"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","CorrelationId":"so-BEA-00001","RequestId":"0HNP68JGDRSHR:00000001","ConnectionId":"0HNP68JGDRSHR","Application":"RockTrack"}
 
-8. In section 6, (API Key Authentication), I have decided to enforece Authentication using [Authentication] in each controller instead of using a fallback policy. Though the fallback policy is global handling ll endpoints in one go, [Authenticator] allows a more granular approach per controller. I have also taken a strict interpretation of "Protect all endpoints with API key authentication" to include  /openapi/v1.json for display openapi. hence this endpoint cannot be reached in the browser. I will include the endpoint as part of the Postman collection which provide the target API-key in requests.  
+8. In section 6, (API Key Authentication), I have decided to enforece Authentication using [Authentication] in each controller instead of using a fallback policy. Though the fallback policy is global handling ll endpoints in 	one go, [Authenticator] allows a more granular approach per controller. I have also taken a strict interpretation of "Protect all endpoints with API key authentication" to include  /openapi/v1.json for display openapi. hence this endpoint cannot be reached in the browser. I will include the endpoint as part of the Postman collection which provide the target API-key in requests.  
 	
 
 9. In section 7(3rd Party Integration with Resilience): 
@@ -129,7 +129,7 @@ Design Tradeoffs
 	a. I chose a separate controller as this was the cleanest approach that preserves the existing endpoints in RockController and allows for the new dependency on a new resource (profile service) that will in turn call the 2 other dependent service (existing RockService and a new one getting the profile).
 	b. due to the slow and unrealiable I/O involved in calling an external API, the new enpoint should use CancellationToken to improve 
 	c. The calls to the 2 dependent services could be made in paralell but there is little benefit as the RockService call will be nearly instantaneous compared to the external Profile service call. Pralelilisation only add unneded complexity so I will the calls in sequence starting with the RockService.
-	d. wrt to supporting libraries,Microsoft.Extensions.Http.Resilience with a custom pipeline(AddResilienceHandler)  vs. between Custom pipeline chosen so each requirement is explicit and testable. 
+	d. regarding supporting libraries, between AddStandardResilienceHandler() and Microsoft.Extensions.Http.Resilience with a custom pipeline(AddResilienceHandler), the later between Custom pipeline  was chosen so each requirement is explicit and testable. 
 	e. I am limiting the amount of data I am getting from the jsonplaceholder API to a contract with name, username and email only. This keeps the payload simple and data minimised i.e. only taking the minimum information needed.	
 
 
