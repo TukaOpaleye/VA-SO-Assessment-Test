@@ -87,6 +87,8 @@ Due to time constraints I left out the completet solution to these sub-sections 
 Section 4: If I understand  "Implemenete global exception handling middleware" as a custom implementation, I missed this point. I do implement app.UseExceptionHandler() in program.cs.
 Section 7: I have no test for a scenario where 3rd part fails after all retries. I would look to write a test http level test. 
 
+In this project I have used Gen AI to research, review and generate code to complete the tasks. All the code has been reviewed me on checkin.
+
 
 Assumptions
 -----------
@@ -244,7 +246,7 @@ At rest,  Azure Key Vault is used to store any secrets for the App is in product
 
 4. CI/CD pipeline strategy:
 --------------------------
-I would define teh infrasructure using Terraform. I owuld created 3 environments (dev, staging and production) each with its own settings.
+I would define the infrasructure using Terraform. I would created 3 environments (dev, staging and production) each with its own settings.
 
 Deployment would run through a multistage Azure devOps YAML pipeline which logs into Azure. All code would be stored in GitHub 
 
