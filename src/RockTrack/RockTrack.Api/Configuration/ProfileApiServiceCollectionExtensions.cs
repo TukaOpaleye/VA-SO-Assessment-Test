@@ -8,6 +8,8 @@ namespace RockTrack.Api.Configuration
 {
     public static class ProfileApiServiceCollectionExtensions
     {
+        private static readonly TimeSpan MinPollyTimeout = TimeSpan.FromMilliseconds(10);
+
         // Third-party profile API: settings, startup checks, typed client and resilience pipeline
         public static IServiceCollection AddProfileApiClient(this IServiceCollection services, IConfiguration configuration)
         {
@@ -20,6 +22,10 @@ namespace RockTrack.Api.Configuration
                 .Validate(options => options.AttemptTimeout > TimeSpan.Zero && options.BaseDelay > TimeSpan.Zero
                                      && options.TotalTimeout > TimeSpan.Zero && options.HttpClientTimeout > TimeSpan.Zero,
                     "ProfileApi timeouts and BaseDelay must be greater than zero.")
+                // Polly only accepts timeouts of 10 ms to 24 h; it checks when the client is first created,
+                // so a smaller value would be a 500 at request time instead of a startup failure
+                .Validate(options => options.AttemptTimeout >= MinPollyTimeout && options.TotalTimeout >= MinPollyTimeout,
+                    "ProfileApi:AttemptTimeout and TotalTimeout must be at least 10 ms.")
                 .Validate(options => options.TotalTimeout > options.AttemptTimeout,
                     "ProfileApi:TotalTimeout must be greater than AttemptTimeout.")
                 .Validate(options => options.HttpClientTimeout > options.TotalTimeout,
