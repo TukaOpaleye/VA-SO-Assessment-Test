@@ -31,8 +31,49 @@ To run Postman
 --------------
 1. In teh docs folder of the repo you will find teh file  VA-Assessment-Tests.postman_collection.json .Import this file into Postman.
 2. The collection should already have the API Key (see X-Api-Key in the json file). 
-3. Note that for test that are PATCH requests will require selecting a valid rock Guid after each application start.
 
+
+Testing of endpoint:
+--------------------
+Below are all teh tests availble in the Postman for testing various scenations. Many can be re-used to test edge cases. 
+Note that for test that are PATCH requests will require selecting a valid rock Guid after each application start.
+
+A) GET /members/{memberId}/rocks 
+	GET  
+		GetMemberRocks-member1
+		GetMemberRocks-member2
+		GetMemberRocks?Status=pending
+		GetMemberRocks?Status=nonexistent
+
+	GET (with Correlation Id)
+		GetMemberRocks-member1-CorrId
+		
+		GetOpenAPI-Endpoint (needs API Key)  - for testing https://localhost:7242/openapi/v1.json 
+
+B) POST /members/{memberId}/rocks
+	POST 
+		Sample-Rock-Creation(Post)
+
+	POST (with Correlation Id)
+		Sample-Rock-Creation-Post-CorrId
+		Sample-Rock-Creation-Post-CorrId Invalid
+		Sample-Rock-Creation-Post-CorrId Error Body
+		Sample-Rock-Creation-Post-CorrId -CoorIdOff
+
+C) PATCH /members/{memberId}/rocks/{rockId} 
+	PATCH 
+		RockUpdate
+
+	PATCH (with Correlation Id)
+		RockUpdate-Patch-CorrId  
+
+D) GET /members/{memberId}/profile/enriched
+	
+	GET Profile Service
+		GetMemberRocks-member1 -Profile
+		GetMemberRocks-member3-Profile(no rocks)
+		GetMemberRocks-member11-Profile(no member)
+		
 
  
 ---------------------------------
@@ -100,19 +141,15 @@ Security Concerns
 
 
 
-Things I would do if I had more time
-------------------------------------
+Things I would add/improve given more time
+------------------------------------------
 
-1. Refactor the tests - they can be collapsed into test cases for example.
+1. Refactor the existing tests - they can be collapsed into test cases for example. I would also add more tests to increase coverage.
 
-2. The Input Validation fixes were implemented and meets all the spec criteria but there are a few edge cases where the validation messages returned malformed JSON indicating there is an issue withe the validation engine. As I result I get validation messages like the below. This is likely resolvable but requires more testing. - example of an error message when I validate DueDate. 
+2. The Input Validation fixes were implemented and meets all the spec criteria but there are a few edge cases where the validation messages returned malformed JSON indicating there is an issue with the validation engine. As I result I get validation messages like the below. I would fix these. This is likely resolvable but requires more testing. - example of an error message when I validate DueDate. 
 	"$.dueDate": ["…could not be converted to System.DateOnly…"]  
 	
-3. I would likely explore a lighter version of a spec-driven development workflow approach for the project.  	
-
-
-
-
+3. I would explore a lighter version of a spec-driven development workflow approach for the project.  	
 
 
 
