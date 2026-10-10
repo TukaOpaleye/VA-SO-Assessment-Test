@@ -11,6 +11,29 @@ Microsoft.Extensions.Logging.Abstractions
 
 
 
+
+
+
+Setup
+-----
+To run the service
+------------------
+
+After you have downloaded and built the solution in Visual Studio, set RockTrack.Api project as teh start project and click F5. 
+For tests,
+1. test url is https://localhost:7242/members/1/rocks   (or https://localhost:7242/openapi/v1.json for openAPI endpoint readable only through Postman as it requires teh API Key) 
+2. the required API authetication API key are in : appsettings.Development.json
+3. the same api key plus url above is included in Postman tests. 
+2. 5 rocks objects are seeded each time teh appliacation starts for testing purposes. The rock Id are Guids and are regenerated randomly each appliacation start.
+
+
+To run Postman
+--------------
+1. In teh docs folder of the repo you will find teh file  VA-Assessment-Tests.postman_collection.json .Import this file into Postman.
+2. The collection should already have the API Key (see X-Api-Key in the json file). 
+3. Note that for test that are PATCH requests will require selecting a valid rock Guid after each application start.
+
+
  
 ---------------------------------
 
@@ -64,7 +87,7 @@ Notes
 1. Section 6: API Key Authentication: with rePostman and the API key
  For simplicity, the Postman collection sets X-Api-Key once at collection level with and every request inherits it. This is a development-only key used for local testing; it must match the key configured for the API (see Running locally).
 
-The API itself never hardcodes the key: it's read from configuration which in Azure  would be Azure Key Vault in production.
+  Regarding deployment to production: The API itself never hardcodes the key: it's read from configuration which in Azure would be Azure Key Vault in production.
 
 
 
@@ -77,9 +100,10 @@ Security Concerns
 
 
 
-If I had more time, I would: 
+Things I would do if I had more time
+------------------------------------
 
-1. Refactor the tests - they can be collapsed into test cases
+1. Refactor the tests - they can be collapsed into test cases for example.
 
 2. The Input Validation fixes were implemented and meets all the spec criteria but there are a few edge cases where the validation messages returned malformed JSON indicating there is an issue withe the validation engine. As I result I get validation messages like the below. This is likely resolvable but requires more testing. - example of an error message when I validate DueDate. 
 	"$.dueDate": ["…could not be converted to System.DateOnly…"]  
@@ -87,8 +111,7 @@ If I had more time, I would:
 3. I would likely explore a lighter version of a spec-driven development workflow approach for the project.  	
 
 
-Other notes:
-1. test url is https://localhost:7242/members/1/rocks
+
 
 
 
@@ -97,18 +120,18 @@ Other notes:
 Strategy for Dealing with Section 3
 -----------------------------------
 
-On a high level I start with a crude implementation of the rules (Stage 1) implementing rules in RockCategoryValidator class with unit tests for one Category Health. Moving rules to RockCategoryValidator which implements IRockCategoryValidator allows me to use DI and inject into the existing code - this also faciliates testing. At this point we have taken a step toward strategy pattern while still in the old implementation. After all rules are captured in code (RockCategoryValidator) one category at a time  (Health (simplest), Career, then Revenue) with passing tests, we then extend the implemenation (Stage 2)fully use the Startegy Pattern for teh next category.
+On a high level I start with a crude implementation of the rules (Stage 1) implementing rules in RockCategoryValidator class with unit tests for one Category Health. Moving rules to RockCategoryValidator which implements IRockCategoryValidator allows me to use DI and inject into the existing code - this also faciliates testing. At this point I have taken a step toward strategy pattern while still in the old implementation. After all rules are captured in code (RockCategoryValidator) one category at a time (Health (simplest), Career, then Revenue) with passing tests, I then extend the implemenation (Stage 2)fully use the Startegy Pattern for teh next category.
 DI in program.cs is updated with  IRockCategoryValidator.
  
  Stage 1: 
- We have a basic structure with unit test that we can verify the rule logic
+ I have a basic structure with unit test that I can verify the rule logic
  RockTrack.Core/Validation/
 	IRockCategoryValidator.cs        (interface)
 	RockCategoryValidator.cs         (holds every category rule as an if/else branch)
  
  
  Stage 2: 
- We now almost lift and shift the rules in classes inheriting from ICategoryRule and transform RockCategoryValidator into the dispatcher.
+ I now almost lift and shift the rules in classes inheriting from ICategoryRule and transform RockCategoryValidator into the dispatcher.
  the unit tests files only have small additive changes. Existing tests stay the same - making for an easy error free transformation.
  Extra unit tests are added to ensure all categories adhere to a rule. Also DI in program.cs was updated with each new rule classes as ICategoryRule .
  
@@ -129,7 +152,11 @@ DI in program.cs is updated with  IRockCategoryValidator.
   2. add a rule class implementing from ICategoryRule
   3. add one DI line
   
-  
+In summary my reasons for this approach is:
+1. In stage 1, I can implement all the rules in one file and have the benefit of sufficiently decoupled code to  have unit tests.
+2. Once stage 1 is complete, I can now with the same tests extend into a full strategy pattern
+3. I find having less files initially easier to think about organisationally.
+4. It is also flexible as I can implement just 2 rules in step 1, refactor into full stategy pattern and add my remaining rules as classes.  
 
  
  

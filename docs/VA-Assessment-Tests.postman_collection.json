@@ -1,0 +1,509 @@
+{
+  "info": {
+    "_postman_id": "f7bb5ec6-dbd6-4fd3-a1f3-e6d528792704",
+    "name": "VA-Assessment-Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "13659802"
+  },
+  "item": [
+    {
+      "name": "GetMemberRocks-member1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks-member1 -Profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/1/profile/enriched",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "profile",
+            "enriched"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks-member3-Profile(no rocks)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/3/profile/enriched",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "3",
+            "profile",
+            "enriched"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks-member11-Profile(no member)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/11/profile/enriched",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "11",
+            "profile",
+            "enriched"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks-member1-CorrId",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "so-BEA-00001",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks-member2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/2/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "2",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks?Status=pending",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks?status=pending",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "pending"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetMemberRocks?Status=nonexistent",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/members/2/rocks?status=nonexistent",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "2",
+            "rocks"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "nonexistent"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sample-Rock-Creation(Post)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Deal Close\",\r\n  \"category\": \"revenue\",\r\n  \"dueDate\": \"2026-10-16\",\r\n  \"note\": \"abcdxyz\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sample-Rock-Creation-Post-CorrId",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Correlation-Id",
+            "value": " test-12345",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Run the London Marathon\",\r\n  \"category\": \"revenue\",\r\n  \"dueDate\": \"2026-10-16\",\r\n  \"note\": \"abcdxyz\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sample-Rock-Creation-Post-CorrId Invalid",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "bad id!@#",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Deal Close\",\r\n  \"category\": \"revenue\",\r\n  \"dueDate\": \"2026-10-16\",\r\n  \"note\": \"abcdxyz\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sample-Rock-Creation-Post-CorrId Error Body",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "A1-try-def-16266262",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Run\",\r\n  \"category\": \"health\",\r\n  \"dueDate\": \"2026-10-16\",\r\n  \"note\": \"abcdxyz\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sample-Rock-Creation-Post-CorrId -CoorIdOff",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "A1-try-def-16266262",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Deal Close\",\r\n  \"category\": \"revenue\",\r\n  \"dueDate\": \"2026-10-16\",\r\n  \"note\": \"abcdxyz\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RockUpdate",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"completed\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks/271af01b-f2bb-49df-8c25-eb9c2a41b542",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks",
+            "271af01b-f2bb-49df-8c25-eb9c2a41b542"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RockUpdate-Patch-CorrId",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "so-001-BEA",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"completed\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7242/members/1/rocks/3a0ec7f9-8a9b-4a3b-8169-1754a8500f64",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "members",
+            "1",
+            "rocks",
+            "3a0ec7f9-8a9b-4a3b-8169-1754a8500f64"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetOpenAPI-Endpoint (needs API Key)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7242/openapi/v1.json",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7242",
+          "path": [
+            "openapi",
+            "v1.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "vaapikey0001",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "X-Api-Key",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
