@@ -57,20 +57,18 @@ namespace RockTrack.Core.Services
         {
             var result = await _repository.UpdateStatusAsync(memberId, rockId, newStatus);
 
-            switch (result.Outcome)
+            if (result.IsSuccess)
             {
-                case UpdateRockStatusOutcome.NotFound:
-                    _logger.LogDebug("Rock {RockId} not found for member {MemberId}", rockId, memberId);
-                    break;
-
-                case UpdateRockStatusOutcome.InvalidTransition:
-                    _logger.LogInformation("Rock {RockId} cannot change status from {CurrentStatus} to {RequestedStatus}",
-                        rockId, result.Rock!.Status, newStatus);
-                    break;
-
-                case UpdateRockStatusOutcome.Updated:
-                    _logger.LogInformation("Rock {RockId} status is now changed to {Status}", rockId, result.Rock!.Status);
-                    break;
+                _logger.LogInformation("Rock {RockId} status is now changed to {Status}", rockId, result.Rock.Status);
+            }
+            else if (result.IsInvalidTransition)
+            {
+                _logger.LogInformation("Rock {RockId} cannot change status from {CurrentStatus} to {RequestedStatus}",
+                    rockId, result.Rock.Status, newStatus);
+            }
+            else
+            {
+                _logger.LogDebug("Rock {RockId} not found for member {MemberId}", rockId, memberId);
             }
 
             return result;

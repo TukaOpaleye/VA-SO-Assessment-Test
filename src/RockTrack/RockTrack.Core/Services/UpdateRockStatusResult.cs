@@ -24,6 +24,9 @@ namespace RockTrack.Core.Services
         [MemberNotNullWhen(true, nameof(Rock))]
         public bool IsSuccess => Outcome == UpdateRockStatusOutcome.Updated;
 
+        [MemberNotNullWhen(true, nameof(Rock))]
+        public bool IsInvalidTransition => Outcome == UpdateRockStatusOutcome.InvalidTransition;
+
         public static UpdateRockStatusResult Updated(Rock rock) => new(UpdateRockStatusOutcome.Updated, rock);
         public static UpdateRockStatusResult NotFound() => new(UpdateRockStatusOutcome.NotFound, null);
         public static UpdateRockStatusResult InvalidTransition(Rock rock) => new(UpdateRockStatusOutcome.InvalidTransition, rock);
