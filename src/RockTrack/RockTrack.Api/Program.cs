@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using RockTrack.Api.Authentication;
+using RockTrack.Api.Configuration;
 using RockTrack.Api.Development;
 using RockTrack.Api.Middleware;
 using RockTrack.Core.Repositories;
@@ -93,6 +94,9 @@ namespace RockTrack.Api
                     .ValidateOnStart();
 
                 builder.Services.AddAuthorization();
+
+                // Third-party profile API: typed client, settings and resilience pipeline
+                builder.Services.AddProfileApiClient(builder.Configuration);
 
                 if (builder.Environment.IsDevelopment())
                 {
