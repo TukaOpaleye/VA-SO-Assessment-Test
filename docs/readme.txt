@@ -3,6 +3,11 @@
 
 
 
+Packages Used
+--------------
+Serilog.AspNetCore
+Microsoft.Extensions.Logging.Abstractions  
+
 
 
 
@@ -28,11 +33,13 @@ Design Tradeoffs
 
 4. In "Input validation requirements" (2), the requirement "Due date must be in the past" is not specifc becasue I use DateOnly type. I will assume that past mean the day before. 
 
+4a.  <<Mention the 2 libraries used approaches possible to use validtion requirement >>
+
 5. Added a data seeder in RockTracker.Api project to pre-seed the in-memory collection to facilitate testing.
 
 6. I have added detaisl of my approch to section 3  below "Strategy for Dealing with Section 3"
 
-7. In section 5 (Structured Logging and Correlation), for easier implementation, I am going to use Serilog which I have used before and offers easy to configuration of the multiple output types. For this I need teh following packages:
+7. In section 5 (Structured Logging and Correlation), for easier implementation, I am going to use Serilog over the .NEt built in logging (Microsoft.Extensions.Logging) as Serilog offers easier and finer external configuration of the multiple output types beyond just Levels (per-namespace overrides, outputs, format, enrichers).  For this I need teh following packages:
 	-Serilog.AspNetCore in the API project -  Hosting integration, request logging, console sink, CompactJsonFormatter, reading from configuration (all included)
 	-Microsoft.Extensions.Logging.Abstractions in the Core project - ILogger<T> for RockService  - interfaces only, no Serilog in Core so this keeps the pure separation with other projects. With the interface we can pass details from RockService in the logging scheme.
 	A series of Postman tests show the correlation Id omming back in teh request for PATCH,GET and POST requests. 
@@ -40,16 +47,21 @@ Design Tradeoffs
 
 		{"@t":"2026-10-09T20:37:16.0684350Z","@mt":"HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms","@r":["3.0071"],"@tr":"25bebf688b399f1fa84be012596f8e87","@sp":"9af3ae5b91e09e4e","RequestQuery":"","RequestMethod":"GET","RequestPath":"/members/1/rocks","StatusCode":200,"Elapsed":3.0071,"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","CorrelationId":"so-BEA-00001","RequestId":"0HNP68JGDRSHR:00000001","ConnectionId":"0HNP68JGDRSHR","Application":"RockTrack"}
 
-8. In section 6, (API Key Authentication), I have taken a strict interpretation of "Protect all endpoints with API key authentication" to include  /openapi/v1.json for display openapi. hence this endpoint cannot be reached in teh browser. I will include teh endpoint as part of the Postman collection which provide teh target API-key in requests.  
+8. In section 6, (API Key Authentication), I have decided to enforece Authentication using [Authentication] in each controller instead of using a fallback policy. Though the fallback policy is global handling ll endpoints in one go, [Authenticator] allows a more granular approach per controller. I have also taken a strict interpretation of "Protect all endpoints with API key authentication" to include  /openapi/v1.json for display openapi. hence this endpoint cannot be reached in the browser. I will include teh endpoint as part of the Postman collection which provide teh target API-key in requests.  
 	
+
+9. In section 7(3rd Party Integration with Resilience): 
+	a. I chose a separate controller as this was teh cleanest approach that preserves the existing endpoints in RockController and allows for the new dependency on a new resource (profile service) that will in turn call the 2 other dependent service (existing RockService and a new one getting teh profile).
+	b. due to the slow and unrealiable I/O involved in calling an external API, the new enpoint should use CancellationToken to improve 
+	c. The calls to teh 2 dependent services could be made in paralell but there is little benefit as teh RockService call will be nearly instantaneous compared to teh external Profile service call. Pralelilisation only add unneded complexity so I will the calls in sequence starting with the RockService.
+	d. wrt to supporting libraries,Microsoft.Extensions.Http.Resilience with a custom pipeline(AddResilienceHandler)  vs. between Custom pipeline chosen so each requirement is explicit and testable. 
+	e. I am limiting the amount of data I am getting from the jsonplaceholder API to a contract with name, username and email only. This keeps the payload simple and data minimised i.e. only taking the minimum information needed.	
 
 
 Notes
 -----
 
-Section 6: API Key Authentication
-
-Postman and the API key
+1. Section 6: API Key Authentication: with rePostman and the API key
  For simplicity, the Postman collection sets X-Api-Key once at collection level with and every request inherits it. This is a development-only key used for local testing; it must match the key configured for the API (see Running locally).
 
 The API itself never hardcodes the key: it's read from configuration which in Azure  would be Azure Key Vault in production.
@@ -71,6 +83,8 @@ If I had more time, I would:
 
 2. The Input Validation fixes were implemented and meets all the spec criteria but there are a few edge cases where the validation messages returned malformed JSON indicating there is an issue withe the validation engine. As I result I get validation messages like the below. This is likely resolvable but requires more testing. - example of an error message when I validate DueDate. 
 	"$.dueDate": ["…could not be converted to System.DateOnly…"]  
+	
+3. I would likely explore a lighter version of a spec-driven development workflow approach for the project.  	
 
 
 Other notes:
