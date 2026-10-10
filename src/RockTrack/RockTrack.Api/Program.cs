@@ -7,6 +7,7 @@ using RockTrack.Api.Authentication;
 using RockTrack.Api.Configuration;
 using RockTrack.Api.Development;
 using RockTrack.Api.Middleware;
+using RockTrack.Core.Profiles;
 using RockTrack.Core.Repositories;
 using RockTrack.Core.Services;
 using RockTrack.Core.Validation;
@@ -82,6 +83,7 @@ namespace RockTrack.Api
                 builder.Services.AddTransient<IRockCategoryValidator, RockCategoryValidator>();
 
                 builder.Services.AddScoped<IRockService, RockService>();
+                builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
 
                 // API key authentication: the key comes from configuration ("ApiKeyAuthentication:ApiKey").
                 builder.Services.AddAuthentication(ApiKeyAuthenticationOptions.SchemeName)
